@@ -3,518 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazon Clone - E-Commerce</title>
+    <title>Amazon</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
 </head>
 <script>
-// Cart functionality
-let cart = [];
-let wishlist = [];
+    function toggleContent()
+    {
+        var hiddenContent=document.getElementById("hidden-Content");
+        hiddenContent.classList.toggle("hidden");
 
-// Product data
-const products = [
-    { id: 1, name: "New Clothes", category: "fashion", price: 29.99, image: "box1_image.jpg", rating: 4.5 },
-    { id: 2, name: "Health & Personal Care", category: "health", price: 49.99, image: "box2_image.jpg", rating: 4.3 },
-    { id: 3, name: "Interiors", category: "home", price: 199.99, image: "box3_image.jpg", rating: 4.7 },
-    { id: 4, name: "Mobiles & Accessories", category: "electronics", price: 599.99, image: "box4_image.jpg", rating: 4.6 },
-    { id: 5, name: "Beauty Care", category: "beauty", price: 34.99, image: "box5_image.jpg", rating: 4.4 },
-    { id: 6, name: "Pet's Care", category: "pets", price: 24.99, image: "box6_image.jpg", rating: 4.5 },
-    { id: 7, name: "New Toys", category: "toys", price: 39.99, image: "box7_image.jpg", rating: 4.8 },
-    { id: 8, name: "Fashion Trends", category: "fashion", price: 59.99, image: "box8_image.jpg", rating: 4.2 }
-];
-
-// Search functionality
-function searchProducts() {
-    const query = document.querySelector('.search-input').value.toLowerCase();
-    const results = products.filter(p => 
-        p.name.toLowerCase().includes(query) || 
-        p.category.toLowerCase().includes(query)
-    );
-    displayProducts(results);
-    showNotification(`Found ${results.length} products`);
-}
-
-// Filter by category
-function filterProducts(category) {
-    if (category === 'all') {
-        displayProducts(products);
-    } else {
-        const filtered = products.filter(p => p.category === category);
-        displayProducts(filtered);
     }
-    showNotification(`Showing ${category} products`);
-}
-
-// Display products
-function displayProducts(productsToShow) {
-    const shopSection = document.querySelector('.shop-section');
-    shopSection.innerHTML = '';
-    
-    productsToShow.forEach((product, index) => {
-        const box = document.createElement('div');
-        box.className = 'box';
-        box.style.animationDelay = `${index * 0.1}s`;
-        box.innerHTML = `
-            <div class="box-content border2">
-                <h2>${product.name}</h2>
-                <div class="box-img" style="background-image:url('${product.image}')"></div>
-                <div class="price">$${product.price.toFixed(2)}</div>
-                <div class="rating">${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5-Math.floor(product.rating))} (${product.rating})</div>
-                <p class="see-more" onclick="showProductDetails(${product.id})">See more...</p>
-                <div class="product-actions">
-                    <button class="add-to-cart" onclick="addToCart(${product.id})">
-                        <i class="fas fa-cart-plus"></i> Add to Cart
-                    </button>
-                    <button class="add-to-wishlist" onclick="addToWishlist(${product.id})">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-        shopSection.appendChild(box);
-    });
-}
-
-// Add to cart
-function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
-    cart.push(product);
-    updateCartCount();
-    showNotification(`${product.name} added to cart!`);
-    saveCart();
-}
-
-// Add to wishlist
-function addToWishlist(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!wishlist.find(p => p.id === productId)) {
-        wishlist.push(product);
-        showNotification(`${product.name} added to wishlist!`);
-        updateWishlistCount();
-    } else {
-        showNotification('Already in wishlist!');
-    }
-}
-
-// Update cart count
-function updateCartCount() {
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = cart.length;
-    }
-}
-
-// Update wishlist count
-function updateWishlistCount() {
-    const wishlistCount = document.querySelector('.wishlist-count');
-    if (wishlistCount) {
-        wishlistCount.textContent = wishlist.length;
-    }
-}
-
-// Save cart to localStorage
-function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(cart));
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-}
-
-// Load cart from localStorage
-function loadCart() {
-    const savedCart = localStorage.getItem('cart');
-    const savedWishlist = localStorage.getItem('wishlist');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
-    }
-    if (savedWishlist) {
-        wishlist = JSON.parse(savedWishlist);
-    }
-    updateCartCount();
-    updateWishlistCount();
-}
-
-// Show notification
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 300);
-    }, 2000);
-}
-
-// Toggle deals
-function toggleContent() {
-    const hiddenContent = document.getElementById("hidden-Content");
-    hiddenContent.classList.toggle("hidden");
-}
-
-// Show product details modal
-function showProductDetails(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    
-    const modal = document.createElement('div');
-    modal.className = 'product-modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <div class="modal-body">
-                <img src="${product.image}" alt="${product.name}" class="modal-image">
-                <div class="modal-info">
-                    <h2>${product.name}</h2>
-                    <div class="modal-price">$${product.price.toFixed(2)}</div>
-                    <div class="modal-rating">${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5-Math.floor(product.rating))} (${product.rating} rating)</div>
-                    <p class="modal-description">High quality ${product.name.toLowerCase()} with excellent features and durability. Perfect for your needs.</p>
-                    <div class="modal-actions">
-                        <button onclick="addToCart(${product.id}); this.parentElement.parentElement.parentElement.remove();">
-                            <i class="fas fa-cart-plus"></i> Add to Cart
-                        </button>
-                        <button onclick="addToWishlist(${product.id})">
-                            <i class="fas fa-heart"></i> Wishlist
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-// Open cart modal
-function openCart() {
-    const modal = document.createElement('div');
-    modal.className = 'cart-modal';
-    modal.innerHTML = `
-        <div class="cart-modal-content">
-            <span class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <h2><i class="fas fa-shopping-cart"></i> Shopping Cart (${cart.length} items)</h2>
-            <div class="cart-items">
-                ${cart.length === 0 ? '<p class="empty-cart">Your cart is empty!</p>' : cart.map(item => `
-                    <div class="cart-item">
-                        <img src="${item.image}" alt="${item.name}">
-                        <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            <p>$${item.price.toFixed(2)}</p>
-                        </div>
-                        <button onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="cart-total">
-                <h3>Total: $${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</h3>
-                <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-// Remove from cart
-function removeFromCart(productId) {
-    const index = cart.findIndex(p => p.id === productId);
-    if (index > -1) {
-        cart.splice(index, 1);
-        updateCartCount();
-        saveCart();
-        openCart(); // Refresh cart modal
-    }
-}
-
-// Checkout function
-function checkout() {
-    if (cart.length === 0) {
-        showNotification('Your cart is empty!');
-        return;
-    }
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
-    alert(`Thank you for your purchase!\n\nTotal: $${total.toFixed(2)}\n\nThis is a demo - no actual payment processed.`);
-    cart = [];
-    updateCartCount();
-    saveCart();
-    document.querySelector('.cart-modal')?.remove();
-    showNotification('Order placed successfully!');
-}
-
-// Open wishlist modal
-function openWishlist() {
-    const modal = document.createElement('div');
-    modal.className = 'wishlist-modal';
-    modal.innerHTML = `
-        <div class="wishlist-modal-content">
-            <span class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <h2><i class="fas fa-heart"></i> Wishlist (${wishlist.length} items)</h2>
-            <div class="wishlist-items">
-                ${wishlist.length === 0 ? '<p class="empty-wishlist">Your wishlist is empty!</p>' : wishlist.map(item => `
-                    <div class="wishlist-item">
-                        <img src="${item.image}" alt="${item.name}">
-                        <div class="wishlist-item-info">
-                            <h4>${item.name}</h4>
-                            <p>$${item.price.toFixed(2)}</p>
-                        </div>
-                        <button onclick="addToCart(${item.id}); removeFromWishlist(${item.id})">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
-                        <button onclick="removeFromWishlist(${item.id})"><i class="fas fa-trash"></i></button>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-// Remove from wishlist
-function removeFromWishlist(productId) {
-    const index = wishlist.findIndex(p => p.id === productId);
-    if (index > -1) {
-        wishlist.splice(index, 1);
-        updateWishlistCount();
-        saveCart();
-        if (document.querySelector('.wishlist-modal')) {
-            openWishlist();
-        }
-    }
-}
-
-// Sign in modal
-function openSignIn() {
-    const modal = document.createElement('div');
-    modal.className = 'signin-modal';
-    modal.innerHTML = `
-        <div class="signin-modal-content">
-            <span class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <h2><i class="fas fa-user"></i> Sign In</h2>
-            <form onsubmit="handleSignIn(event)">
-                <input type="email" placeholder="Email or phone number" required>
-                <input type="password" placeholder="Password" required>
-                <button type="submit">Continue</button>
-            </form>
-            <p>New to Amazon? <a href="#" onclick="openSignUp()">Create account</a></p>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-// Sign up modal
-function openSignUp() {
-    document.querySelector('.signin-modal')?.remove();
-    const modal = document.createElement('div');
-    modal.className = 'signup-modal';
-    modal.innerHTML = `
-        <div class="signup-modal-content">
-            <span class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <h2><i class="fas fa-user-plus"></i> Create Account</h2>
-            <form onsubmit="handleSignUp(event)">
-                <input type="text" placeholder="Full Name" required>
-                <input type="email" placeholder="Email" required>
-                <input type="password" placeholder="Password" required>
-                <button type="submit">Create Account</button>
-            </form>
-            <p>Already have an account? <a href="#" onclick="openSignIn()">Sign In</a></p>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-// Handle sign in
-function handleSignIn(e) {
-    e.preventDefault();
-    showNotification('Signed in successfully! (Demo)');
-    document.querySelector('.signin-modal')?.remove();
-    localStorage.setItem('user', 'signedIn');
-}
-
-// Handle sign up
-function handleSignUp(e) {
-    e.preventDefault();
-    showNotification('Account created successfully! (Demo)');
-    document.querySelector('.signup-modal')?.remove();
-}
-
-// Scroll to top
-function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    loadCart();
-    displayProducts(products);
-    
-    // Add event listener for search
-    document.querySelector('.search-icon')?.addEventListener('click', searchProducts);
-    document.querySelector('.search-input')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') searchProducts();
-    });
-    
-    // Add cart click handler
-    document.querySelector('.nav-cart')?.addEventListener('click', openCart);
-    
-    // Add sign in click handler
-    document.querySelector('.nav-signin')?.addEventListener('click', openSignIn);
-});
 </script>
-</head>
 <body>
     <header>
         <div class="navbar">
-            <div class="nav-logo border" onclick="window.location.reload()">
+            <div class="nav-logo border">
                 <div class="logo"></div>
             </div>
             <div class="nav-address border">
                 <p class="add-first">Deliver To</p>
                 <div class="add-icon">
                     <i class="fa-solid fa-location-dot"></i>
-                    <p class="add-second">India</p>
-                </div>
+                <p class="add-second">India</p>
+            </div>
+
             </div>
             <div class="nav-search">
-                <select class="search-select">
-                    <option value="all" onclick="filterProducts('all')">All</option>
-                    <option value="fashion" onclick="filterProducts('fashion')">Fashion</option>
-                    <option value="electronics" onclick="filterProducts('electronics')">Electronics</option>
-                    <option value="health" onclick="filterProducts('health')">Health</option>
-                    <option value="home" onclick="filterProducts('home')">Home</option>
-                    <option value="beauty" onclick="filterProducts('beauty')">Beauty</option>
-                    <option value="pets" onclick="filterProducts('pets')">Pets</option>
-                    <option value="toys" onclick="filterProducts('toys')">Toys</option>
-                </select>
-                <input type="text" placeholder="Search Amazon" class="search-input">
-                <div class="search-icon">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
+            <select class="search-select">
+                <option><a href="#">All</a></option>
+                <option>Groceries</option>
+               <option>Electronics</option>
+               <option>Fashion</option>
+               <option>Food</option>
+            </select>
+            <input placeholder="Search-Amazon" class="search-input">
+            <div class="search-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <div class="nav-signin border" onclick="openSignIn()">
-                <p><span>Hello, Sign In</span></p>
-                <p class="nav-second">Account & Lists</p>
             </div>
-            <div class="nav-return border">
-                <p><span>Return</span></p>
-                <p class="nav-second">& Orders</p>
-            </div>
-            <div class="nav-cart border" onclick="openCart()">
-                <i class="fa-solid fa-cart-shopping"></i>
-                Cart
-                <span class="cart-count">0</span>
-            </div>
-            <div class="nav-wishlist border" onclick="openWishlist()">
-                <i class="fa-solid fa-heart"></i>
-                <span class="wishlist-count">0</span>
-            </div>
+        <div class="nav-signin border">
+            <p><span>Hello,Sign In</span></p>
+            <p class="nav-second">Account & Lists</p>
         </div>
-        <div class="panel">
-            <div class="panel-all border">
-                <i class="fa-solid fa-bars"></i>
-                All
-            </div>
-            <div class="nav">
-                <ul>
-                    <li><a href="#" onclick="filterProducts('electronics')">Today's Deal</a></li>
-                    <li><a href="#" onclick="filterProducts('fashion')">Customer Service</a></li>
-                    <li><a href="#">Registry</a></li>
-                    <li><a href="#">Gift Cards</a></li>
-                    <li><a href="#" onclick="filterProducts('all')">Sell</a></li>
-                </ul>
-            </div>
-            <div class="panel-deals border" onclick="filterProducts('electronics')">
-                Shop Deals in Electronics
-            </div>
+        <div class="nav-return border">
+            <p><span>Return</span></p>
+            <p class="nav-second">&Orders</p>
         </div>
+        <div class="nav-cart border">
+            <i class="fa-solid fa-cart-shopping"></i>
+            Cart
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-all border">
+            <i class="fa-solid fa-bars"></i>
+            All
+        </div><div class="nav">
+            <ul>
+                <li><a href="#">Today's Deal</a></li>
+                <li><a href="#">Customer Service</a></li>
+                <li><a href="#">Registry</a></li>
+                <li><a href="#">Gift Cards</a></li>
+            </ul>
+        </div>
+        
+        <div class="panel-deals border">
+            Shop Deals in Electronics
+        </div>
+    </div>
+        
     </header>
     <div class="hero-section">
         <div class="hero-msg">
-            <p>You are on amazon.com. You can also shop on Amazon India for millions of products with fast local delivery.</p>
-            <div class="button border2">
-                <a href="https://www.amazon.in" target="_blank">Click here to go to amazon.in</a>
+            <p>You are on amazon.com .You can also shop on Amazon India for millions of products with fast local delivery.</p> <div class="button border2">
+            <a href="https://www.amazon.in" target="_blank" >Click here to go to amazon.in</a>
             </div>
         </div>
     </div>
     <div class="shop-section">
-        <!-- Products will be dynamically loaded here -->
+        <div class="box1 box">
+        <div class="box-content border2">
+            <h2> New Clothes</h2>
+        <div class="box-img"style="background-image:url('box1_image.jpg')"></div>
+            <p>See more...</p>
+        </div>
+        </div>
+        <div class="box2 box">
+            <div class="box-content border2">
+            <h2>Health&Personal Care</h2>
+        <div class="box-img"style="background-image:url('box2_image.jpg')"></div>
+            <p>See more...</p>
+        </div>
+        </div>
+        <div class="box3 box"><div class="box-content border2">
+            <h2> Interiors </h2>
+        <div class="box-img"style="background-image:url('box3_image.jpg')"></div>
+            <p>See more...</p>
+        </div>
+    </div>
+        <div class="box4 box"><div class="box-content border2">
+            <h2> Mobiles & Accessories</h2>
+        <div class="box-img"style="background-image:url('box4_image.jpg')"></div>
+            <p>See more...</p>
+        </div>
+    </div>
+    <div class="box5 box">
+        <div class="box-content border2">
+            <h2> Beauty Care </h2>
+        <div class="box-img"style="background-image:url('box5_image.jpg')"></div>
+            <p>See more...</p>
+        </div>
+        </div>
+        <div class="box6 box">
+            <div class="box-content border2">
+            <h2> Pet's Care </h2>
+        <div class="box-img"style="background-image:url('box6_image.jpg')"></div>
+            <p>See more...</p>
+        </div>
+        </div>
+        <div class="box7 box"><div class="box-content border2">
+            <h2> New Toys </h2>
+        <div class="box-img"style="background-image:url('box7_image.jpg')"></div>
+            <p>See more...</p>
+        </div>
+    </div>
+        <div class="box8 box"><div class="box-content border2">
+            <h2> Fashion Trends </h2>
+        <div class="box-img"style="background-image:url('WIN_20250628_21_32_53_Pro.jpg')"></div>
+            <p>See more...</p>
+        </div>
+    </div>
     </div>
     <section>
         <div class="foot-panel5">
-            <button class="button2" onclick="toggleContent()">
-                <h3><strong>Get More Deals...</strong></h3>
-            </button>
-            <div id="hidden-Content" class="hidden">
-                <div class="hidden1">
-                    <div class="deal-cards">
-                        <div class="deal-card">
-                            <h4>Flash Sale!</h4>
-                            <p>Up to 50% off on Electronics</p>
-                            <button onclick="filterProducts('electronics')">Shop Now</button>
-                        </div>
-                        <div class="deal-card">
-                            <h4>New Arrivals</h4>
-                            <p>Check out the latest fashion trends</p>
-                            <button onclick="filterProducts('fashion')">Explore</button>
-                        </div>
-                        <div class="deal-card">
-                            <h4>Summer Sale</h4>
-                            <p>Hot deals on summer essentials</p>
-                            <button onclick="filterProducts('all')">View All</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <button class="button2 " onclick="toggleContent()"><h3><strong>Get More Deals...</strong></h3></button>
+    <div id="hidden-Content" class="hidden">
+    <div class="hidden1">
+    <p><h4>New Deals Are Coming Soon...</h4></p>
+    </div>
+    </div>
     </section>
-    <footer>
-        <div class="foot-panel1" onclick="scrollToTop()">
-            <strong>Back To Top</strong>
+    </div>
+<footer>
+    <div class="foot-panel1">
+          <strong> Back To Top</strong>
+    </div>
+    <div class="foot-panel2">
+        <ul>
+            <p><a>Get to know us</a></p>
+            <a>Careers</a>
+            <a>Blog</a>
+            <a>Investor Relations</a>
+            <a>Amazon Devices</a>
+            <a>Amazon Science</a>
+        </ul>
+        <ul>
+            <p><a>Get to know us</a></p>
+            <a>Careers</a>
+            <a>Blog</a>
+            <a>Investor Relations</a>
+            <a>Amazon Devices</a>
+            <a>Amazon Science</a>
+        </ul>
+        <ul>
+            <p><a>Get to know us</a></p>
+            <a>Careers</a>
+            <a>Blog</a>
+            <a>Investor Relations</a>
+            <a>Amazon Devices</a>
+            <a>Amazon Science</a>
+        </ul>
+        <ul>
+            <p><a>Get to know us</a></p>
+            <a>Careers</a>
+            <a>Blog</a>
+            <a>Investor Relations</a>
+            <a>Amazon Devices</a>
+            <a>Amazon Science</a>
+        </ul>
+    </div>
+    <div class="foot-panel3">
+        <div class="logo">
+
         </div>
-        <div class="foot-panel2">
-            <ul>
-                <p><a>Get to know us</a></p>
-                <a href="#">Careers</a>
-                <a href="#">Blog</a>
-                <a href="#">Investor Relations</a>
-                <a href="#">Amazon Devices</a>
-                <a href="#">Amazon Science</a>
-            </ul>
-            <ul>
-                <p><a>Make Money with Us</a></p>
-                <a href="#">Sell products on Amazon</a>
-                <a href="#">Sell on Amazon Business</a>
-                <a href="#">Sell apps on Amazon</a>
-                <a href="#">Become an Affiliate</a>
-                <a href="#">Advertise Your Products</a>
-            </ul>
-            <ul>
-                <p><a>Amazon Payment Products</a></p>
-                <a href="#">Amazon Business Card</a>
-                <a href="#">Shop with Points</a>
-                <a href="#">Reload Your Balance</a>
-                <a href="#">Amazon Currency Converter</a>
-            </ul>
-            <ul>
-                <p><a>Let Us Help You</a></p>
-                <a href="#">Amazon and COVID-19</a>
-                <a href="#">Your Account</a>
-                <a href="#">Your Orders</a>
-                <a href="#">Shipping Rates & Policies</a>
-                <a href="#">Returns & Replacements</a>
-                <a href="#">Help</a>
-            </ul>
-        </div>
-        <div class="foot-panel3">
-            <div class="logo"></div>
-        </div>
-        <div class="foot-panel4">
-            <div class="pages">
-                <a href="#">Conditions of Use</a>
-                <a href="#">Privacy Notice</a>
-                <a href="#">Your Ads Privacy Choices</a>
-                <div class="copyright">
-                    @1996-2024, Amazon Clone, Inc. or its affiliates
-                </div>
+    </div>
+    <div class="foot-panel4">
+        <div class="pages">
+            <a>Conditions of Use</a>
+            <a>Privacy Notice</a>
+            <a>Your Ads Privacy Choices</a>
+            <div class="copyright">
+                @1996-2023,Amazon.com,Inc. or its affiliates
             </div>
         </div>
-    </footer>
+    </div>
+</footer>
+    
 </body>
 </html>
-

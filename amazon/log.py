@@ -51,9 +51,9 @@ class LoginScreen(Screen):
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (user, pwd))
         result = cursor.fetchone()
         if result:
-            self.message.text = "Login successful!"
+            self.message.text = "✅ Login successful!"
         else:
-            self.message.text = "Invalid credentials"
+            self.message.text = "❌ Invalid credentials"
 
     def go_to_signup(self, instance):
         self.manager.current = 'signup'
@@ -91,25 +91,11 @@ class SignupScreen(Screen):
         try:
             cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user, pwd))
             conn.commit()
-            self.message.text = "Account created!"
+            self.message.text = "✅ Account created!"
         except sqlite3.IntegrityError:
-            self.message.text = "Username already exists"
+            self.message.text = "⚠️ Username already exists"
 
     def go_to_login(self, instance):
-        self.manager.current = 'login'
-
-# Dashboard Screen
-class DashboardScreen(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical', padding=40, spacing=20)
-        layout.add_widget(Label(text='Welcome to your Dashboard!', font_size=28))
-        logout_btn = Button(text='Logout', size_hint=(1, 0.2))
-        logout_btn.bind(on_press=self.logout)
-        layout.add_widget(logout_btn)
-        self.add_widget(layout)
-
-    def logout(self, instance):
         self.manager.current = 'login'
 
 # App Manager
@@ -118,9 +104,19 @@ class AuthApp(App):
         sm = ScreenManager()
         sm.add_widget(LoginScreen(name='login'))
         sm.add_widget(SignupScreen(name='signup'))
-        sm.add_widget(DashboardScreen(name='dashboard'))
         return sm
 
 if __name__ == '__main__':
     AuthApp().run()
+class DashboardScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = BoxLayout(orientation='vertical', padding=40, spacing=20)
+        layout.add_widget(Label(text='🎉 Welcome to your Dashboard!', font_size=28))
+        logout_btn = Button(text='Logout', size_hint=(1, 0.2))
+        logout_btn.bind(on_press=self.logout)
+        layout.add_widget(logout_btn)
+        self.add_widget(layout)
 
+    def logout(self, instance):
+        self.manager.current = 'login'

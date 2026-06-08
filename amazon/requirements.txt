@@ -1,4 +1,0 @@
-# Kivy Dependencies
-kivy>=2.2.0
-kivymd>=1.1.0
-
